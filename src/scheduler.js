@@ -21,10 +21,12 @@ class Scheduler extends EventEmitter{
             const delay = 1000;
             const elapsedTime = process.hrtime(lastCheck);
             const elapsedMs = (elapsedTime[0] * 1e9 + elapsedTime[1]) / 1e6;
-            const missedExecutions = Math.floor(elapsedMs / 1000);
+            // const missedExecutions = Math.floor(elapsedMs / 1000);
+            const missedExecutions = Math.max(0, Math.floor(elapsedMs / 1000) - 1);
+            const executeTime = new Date().getTime();
             
             for(let i = missedExecutions; i >= 0; i--){
-                const date = new Date(new Date().getTime() - i * 1000);
+                const date = new Date(executeTime - i * 1000);
                 let date_tmp = this.timeMatcher.apply(date);
                 if(lastExecution.getTime() < date_tmp.getTime() && (i === 0 || this.autorecover) && this.timeMatcher.match(date)){
                     this.emit('scheduled-time-matched', date_tmp);
